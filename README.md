@@ -1,6 +1,6 @@
 # ghrsst
-A Python package for extracting data from Geo_Polar_Blended-OSPO-L4-GLOB-v1.0
-and Geo_Polar_Blended_Night-OSPO-L4-GLOB-v1.0
+A Python package for extracting data from Geo_Polar_Blended-OSPO-L4-GLOB-v1.0,
+Geo_Polar_Blended_Night-OSPO-L4-GLOB-v1.0 and CMC0.2deg-CMC-L4-GLOB-v2.0
 
 Quickstart
 ----------
@@ -31,7 +31,7 @@ $ python fetch_sst.py --start_date 2020-04-01 --lat 53.360449 --lon 0.258434
 
 * Get night-time SST in Tomakomai bay in 2018:
 ```
-$ python fetch_sst.py --start_date 2018-01-01 --end_date 2018-12-31 --night
+$ python fetch_sst.py --start_date 2018-01-01 --end_date 2018-12-31 --source CMCZeroPointTwoDeg
 ```
 
 Installation
@@ -65,6 +65,12 @@ version 2)
 Analysis (GDS version 2)
     * https://podaac.jpl.nasa.gov/dataset/Geo_Polar_Blended_Night-OSPO-L4-GLOB-v1.0
     
-This data is available from 2014-06-02 until present (2020-04-12 at writing)
+This data is available from 2014-06-02 until present (2020-08-19 at writing)
 with some gaps. Temperatures are given as an average for the 24 hours or for
 the night-time.
+
+* GHRSST Level 4 CMC 0.2deg Global Sea Surface Temperature Analysis (version 2)
+    * https://podaac.jpl.nasa.gov/dataset/CMC0.2deg-CMC-L4-GLOB-v2.0
+    
+This data is available from 1990-09-01 until 2017-03-17. Temperatures are
+based on the 24 hours preceeding each midday.
