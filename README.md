@@ -29,7 +29,7 @@ $ python fetch_sst.py --help
 $ python fetch_sst.py --start_date 2020-04-01 --lat 53.360449 --lon 0.258434
 ```
 
-* Get night-time SST in Tomakomai bay in 2018:
+* Get the CMC data SST in Tomakomai bay in 2018:
 ```
 $ python fetch_sst.py --start_date 2018-01-01 --end_date 2018-12-31 --source CMCZeroPointTwoDeg
 ```
