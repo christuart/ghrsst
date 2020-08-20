@@ -10,15 +10,12 @@ Distributed under GNU GPLv3
 import ghrsst
 import datetime
 
-def fetch_sst_and_store_as_csv(start_date, end_date, this_lat, this_lon, night):
+def fetch_sst_and_store_as_csv(sst_source, start_date, end_date, this_lat, this_lon):
     '''Method to read from a date range at a specific latitude and longitude
     for either the combined or the night-only datasets for SST.
     '''
     #We are going to open a file to store data in, first we need a name for it
-    if night:
-        filename_base = "sst_night_from_%04d%02d%02d_to_%04d%02d%02d_at_%.3fN_%.3fE.csv"
-    else:
-        filename_base = "sst_from_%04d%02d%02d_to_%04d%02d%02d_at_%.3fN_%.3fE.csv"
+    filename_base = sst_source.get_csv_file_name() + "_from_%04d%02d%02d_to_%04d%02d%02d_at_%.3fN_%.3fE.csv"
         
     filename = filename_base % (
                    start_date.year, 
@@ -34,10 +31,12 @@ def fetch_sst_and_store_as_csv(start_date, end_date, this_lat, this_lon, night):
     #Now we open the file to write, and buffer only one line at a time because
     #we like to peek at the data as it is collected
     with open(filename, "w", buffering=1) as f:
+        #Write the CSV header row
+        f.write("year,month,day,latitude,longitude,analysed_sst\n")
+        
         #Create a list of numbers starting at 0 with as many items as there are
         #going to be dates in our date_range
         days_range = range((end_date-start_date).days+1)
-        
         for d in days_range:
             #Find the day we are looking at in this round of the loop, and
             #print it to the console so the user can see the progress
@@ -47,7 +46,7 @@ def fetch_sst_and_store_as_csv(start_date, end_date, this_lat, this_lon, night):
             #Now try to get data, and if it fails print a message that there
             #was no data
             try:
-                this_data = ghrsst.get_sst_data(this_day, lat=this_lat, lon=this_lon, night=night)
+                this_data = sst_source.get_sst_data(this_day, lat=this_lat, lon=this_lon)
                 
                 #If the line above didn't fail then we have data! Extract the
                 #sst from the netCDF4.Dataset object and print it to console
@@ -71,7 +70,8 @@ def fetch_sst_and_store_as_csv(start_date, end_date, this_lat, this_lon, night):
                 #go the script will fail after 27 days.
                 this_data.close()
                 
-            except OSError:
+            except OSError as e:
+                print(e)
                 print("no data")
                 
     print("Finished writing to " + filename)
@@ -93,7 +93,7 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--end_date", required=False, default=None, help="The last date to collect SST for")
     parser.add_argument("--latitude", required=False, default="42.575", help="The latitude (degrees north) to collect SST for")
     parser.add_argument("--longitude", required=False, default="141.675", help="The longitude (degrees east) to collect SST for")
-    parser.add_argument("--night", required=False, default=False, action="store_const", const=True, help="Read night data instead of combined")
+    parser.add_argument("--source", required=False, default="GeoPolarBlended", help="Set which dataset to use: GeoPolarBlended (default), GeoPolarBlendedNight or CMCZeroPointTwoDeg")
     
     #Then, run the parser and store the result in args.
     args = parser.parse_args()
@@ -116,5 +116,8 @@ if __name__ == "__main__":
     #Get the longitude (deg E) as a float
     this_lon = float(args.longitude)
     
+    #Finally, we'll get an instance of our chosen source of SST data
+    sst_source = getattr(ghrsst, args.source)()
+    
     #We have all our parameters, let's go...
-    fetch_sst_and_store_as_csv(start_date, end_date, this_lat, this_lon, args.night)
+    fetch_sst_and_store_as_csv(sst_source, start_date, end_date, this_lat, this_lon)
